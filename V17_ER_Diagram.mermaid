@@ -1,0 +1,94 @@
+erDiagram
+    INSTITUTION ||--o{ DEPARTMENT : has
+
+    DEPARTMENT ||--o{ FACULTY : employs
+    DEPARTMENT ||--o{ STUDENT : enrolls
+
+    FACULTY ||--o| USER_ACCOUNT : "is a"
+    STUDENT ||--o| USER_ACCOUNT : "is a"
+
+    USER_ACCOUNT ||--o{ BOOKING : requests
+    USER_ACCOUNT ||--o{ BOOKING : approves
+    FACILITY ||--o{ BOOKING : "booked for"
+
+    BOOKING ||--o{ BOOKING_STATUS_LOG : logs
+    BOOKING ||--o{ SLOT_ADJUSTMENT_REQUEST : "is target of"
+    USER_ACCOUNT ||--o{ SLOT_ADJUSTMENT_REQUEST : initiates
+
+    INSTITUTION {
+        string institution_id PK
+        string name
+    }
+
+    DEPARTMENT {
+        string department_id PK
+        string name
+        string institution_id FK
+    }
+
+    FACULTY {
+        string faculty_id PK
+        string name
+        string department_id FK
+    }
+
+    STUDENT {
+        string student_id PK
+        string name
+        string department_id FK
+    }
+
+    USER_ACCOUNT {
+        string user_id PK
+        string name
+        string email
+        string role "Student | Faculty | Admin"
+        string student_id FK "nullable"
+        string faculty_id FK "nullable"
+    }
+
+    FACILITY {
+        string facility_id PK
+        string name
+        string category
+        int capacity
+        string location
+        string approval_type "Restricted | Auto-approve"
+    }
+
+    BOOKING {
+        string booking_id PK
+        string facility_id FK
+        string requester_user_id FK
+        string approved_by_user_id FK "nullable"
+        datetime start_time
+        datetime end_time
+        string purpose
+        int attendee_count
+        string status "Pending|Approved|Rejected|Cancelled"
+        string cancellation_reason "nullable"
+        datetime cancellation_timestamp "nullable"
+        datetime created_at
+    }
+
+    BOOKING_STATUS_LOG {
+        string log_id PK
+        string booking_id FK
+        string old_status
+        string new_status
+        string changed_by_user_id FK
+        datetime changed_at
+    }
+
+    SLOT_ADJUSTMENT_REQUEST {
+        string adjustment_id PK
+        string target_booking_id FK
+        string requesting_user_id FK
+        string request_type "Swap | Relinquish"
+        datetime proposed_alt_start "nullable"
+        datetime proposed_alt_end "nullable"
+        string message
+        string negotiation_status "Pending|Accepted|Declined|Expired"
+        datetime created_at
+        datetime responded_at "nullable"
+    }
